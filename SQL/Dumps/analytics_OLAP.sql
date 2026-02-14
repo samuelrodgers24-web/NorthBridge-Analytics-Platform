@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict ieZzcaYd5TZLLy53OtoJbUQTdBXxBGk4quNsbphAuKLK5KVQPEbsKSKTRrDY7KO
+\restrict LAFUm9eMzavSCP3B94DxwrF42OzLS3Jx9C0PcOEO2Byuleoow5lGuRgNLjddX9d
 
 -- Dumped from database version 18.1
 -- Dumped by pg_dump version 18.1
@@ -74,6 +74,20 @@ CREATE TABLE analytics.d_time (
 ALTER TABLE analytics.d_time OWNER TO alex_analytics;
 
 --
+-- Name: f_conversion; Type: TABLE; Schema: analytics; Owner: alex_analytics
+--
+
+CREATE TABLE analytics.f_conversion (
+    cx_id uuid DEFAULT gen_random_uuid() NOT NULL,
+    base_amount numeric(18,4) NOT NULL,
+    fee_amount numeric(16,4) NOT NULL,
+    fx_id uuid NOT NULL
+);
+
+
+ALTER TABLE analytics.f_conversion OWNER TO alex_analytics;
+
+--
 -- Name: f_fx_rate; Type: TABLE; Schema: analytics; Owner: alex_analytics
 --
 
@@ -94,10 +108,8 @@ CREATE TABLE analytics.f_transaction (
     amount numeric(18,4) NOT NULL,
     c_id uuid NOT NULL,
     time_id uuid NOT NULL,
-    base_cncy character varying(3) DEFAULT NULL::character varying,
-    quote_cncy character varying(3) NOT NULL,
-    fx_rate uuid,
-    base_amount numeric(18,4) DEFAULT NULL::numeric
+    cncy character varying(3) CONSTRAINT f_transaction_quote_cncy_not_null NOT NULL,
+    cx_id uuid
 );
 
 
@@ -108,7 +120,6 @@ ALTER TABLE analytics.f_transaction OWNER TO alex_analytics;
 --
 
 COPY analytics.d_company (c_id, c_name, industry, hq_country, default_cncy) FROM stdin;
-f30835c4-d4b7-480a-89a5-17e730a7ff15	Fake Company	Fake Industry	Fake Country	AED
 \.
 
 
@@ -117,8 +128,6 @@ f30835c4-d4b7-480a-89a5-17e730a7ff15	Fake Company	Fake Industry	Fake Country	AED
 --
 
 COPY analytics.d_currency (cncy_code, cncy_name) FROM stdin;
-AED	UAE Dirham
-USD	US Dollars
 \.
 
 
@@ -127,7 +136,14 @@ USD	US Dollars
 --
 
 COPY analytics.d_time (time_id, t_stamp, fisc_quarter, day_of_week) FROM stdin;
-6fe3ab9e-a58c-4614-a9f9-8e165bfaba42	2026-02-14 16:02:26.517208-05	1	7
+\.
+
+
+--
+-- Data for Name: f_conversion; Type: TABLE DATA; Schema: analytics; Owner: alex_analytics
+--
+
+COPY analytics.f_conversion (cx_id, base_amount, fee_amount, fx_id) FROM stdin;
 \.
 
 
@@ -136,7 +152,6 @@ COPY analytics.d_time (time_id, t_stamp, fisc_quarter, day_of_week) FROM stdin;
 --
 
 COPY analytics.f_fx_rate (fx_id, rate) FROM stdin;
-9bb70b71-feae-4540-a103-4bbbaa53988b	3.6700000
 \.
 
 
@@ -144,7 +159,7 @@ COPY analytics.f_fx_rate (fx_id, rate) FROM stdin;
 -- Data for Name: f_transaction; Type: TABLE DATA; Schema: analytics; Owner: alex_analytics
 --
 
-COPY analytics.f_transaction (tx_id, amount, c_id, time_id, base_cncy, quote_cncy, fx_rate, base_amount) FROM stdin;
+COPY analytics.f_transaction (tx_id, amount, c_id, time_id, cncy, cx_id) FROM stdin;
 \.
 
 
@@ -173,6 +188,14 @@ ALTER TABLE ONLY analytics.d_time
 
 
 --
+-- Name: f_conversion f_conversion_pkey; Type: CONSTRAINT; Schema: analytics; Owner: alex_analytics
+--
+
+ALTER TABLE ONLY analytics.f_conversion
+    ADD CONSTRAINT f_conversion_pkey PRIMARY KEY (cx_id);
+
+
+--
 -- Name: f_fx_rate f_fx_rate_pkey; Type: CONSTRAINT; Schema: analytics; Owner: alex_analytics
 --
 
@@ -189,14 +212,6 @@ ALTER TABLE ONLY analytics.f_transaction
 
 
 --
--- Name: f_transaction f_transaction_base_cncy_fkey; Type: FK CONSTRAINT; Schema: analytics; Owner: alex_analytics
---
-
-ALTER TABLE ONLY analytics.f_transaction
-    ADD CONSTRAINT f_transaction_base_cncy_fkey FOREIGN KEY (base_cncy) REFERENCES analytics.d_currency(cncy_code);
-
-
---
 -- Name: f_transaction f_transaction_c_id_fkey; Type: FK CONSTRAINT; Schema: analytics; Owner: alex_analytics
 --
 
@@ -205,11 +220,11 @@ ALTER TABLE ONLY analytics.f_transaction
 
 
 --
--- Name: f_transaction f_transaction_quote_fx_rate_fkey; Type: FK CONSTRAINT; Schema: analytics; Owner: alex_analytics
+-- Name: f_transaction f_transaction_cx_id_fkey; Type: FK CONSTRAINT; Schema: analytics; Owner: alex_analytics
 --
 
 ALTER TABLE ONLY analytics.f_transaction
-    ADD CONSTRAINT f_transaction_quote_fx_rate_fkey FOREIGN KEY (fx_rate) REFERENCES analytics.f_fx_rate(fx_id);
+    ADD CONSTRAINT f_transaction_cx_id_fkey FOREIGN KEY (cx_id) REFERENCES analytics.f_conversion(cx_id);
 
 
 --
@@ -224,5 +239,5 @@ ALTER TABLE ONLY analytics.f_transaction
 -- PostgreSQL database dump complete
 --
 
-\unrestrict ieZzcaYd5TZLLy53OtoJbUQTdBXxBGk4quNsbphAuKLK5KVQPEbsKSKTRrDY7KO
+\unrestrict LAFUm9eMzavSCP3B94DxwrF42OzLS3Jx9C0PcOEO2Byuleoow5lGuRgNLjddX9d
 
