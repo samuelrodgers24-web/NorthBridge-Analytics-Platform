@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict FriY4TAWftPf8gyj87Jw5kBz7D6vBHthJHuYnwWXG43O6N9271MRLxY9wsZFP4J
+\restrict 47PSbpZaYGXL0kzgxeLPYdr7ymEhvxsWh8fz1vEF86uO6K7SfukYB6hWZ3abM72
 
 -- Dumped from database version 18.1
 -- Dumped by pg_dump version 18.1
@@ -64,7 +64,7 @@ ALTER TABLE analytics.d_currency OWNER TO alex_analytics;
 
 CREATE TABLE analytics.d_time (
     time_id uuid DEFAULT gen_random_uuid() NOT NULL,
-    t_stamp timestamp without time zone NOT NULL,
+    t_stamp timestamp with time zone NOT NULL,
     fisc_quarter smallint NOT NULL,
     day_of_week smallint NOT NULL
 );
@@ -225,5 +225,5 @@ ALTER TABLE ONLY analytics.f_transaction
 -- PostgreSQL database dump complete
 --
 
-\unrestrict FriY4TAWftPf8gyj87Jw5kBz7D6vBHthJHuYnwWXG43O6N9271MRLxY9wsZFP4J
+\unrestrict 47PSbpZaYGXL0kzgxeLPYdr7ymEhvxsWh8fz1vEF86uO6K7SfukYB6hWZ3abM72
 
