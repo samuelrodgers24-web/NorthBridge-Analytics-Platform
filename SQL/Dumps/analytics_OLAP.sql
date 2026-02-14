@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict YKuR9VSvpPhTW0fYoRtcdmmV2UPk7FJXkQOxEHBnfOLOnwafpvfWsZBeXae2Du6
+\restrict FriY4TAWftPf8gyj87Jw5kBz7D6vBHthJHuYnwWXG43O6N9271MRLxY9wsZFP4J
 
 -- Dumped from database version 18.1
 -- Dumped by pg_dump version 18.1
@@ -37,7 +37,7 @@ SET default_table_access_method = heap;
 --
 
 CREATE TABLE analytics.d_company (
-    c_id uuid NOT NULL,
+    c_id uuid DEFAULT gen_random_uuid() NOT NULL,
     c_name character varying(60) NOT NULL,
     industry character varying(60) NOT NULL,
     hq_country character varying(60) NOT NULL
@@ -51,7 +51,7 @@ ALTER TABLE analytics.d_company OWNER TO alex_analytics;
 --
 
 CREATE TABLE analytics.d_currency (
-    cncy_code character varying(3) NOT NULL,
+    cncy_code character varying(3) DEFAULT 'XXX'::character varying NOT NULL,
     cncy_name character varying(60) NOT NULL
 );
 
@@ -63,7 +63,7 @@ ALTER TABLE analytics.d_currency OWNER TO alex_analytics;
 --
 
 CREATE TABLE analytics.d_time (
-    time_id uuid NOT NULL,
+    time_id uuid DEFAULT gen_random_uuid() NOT NULL,
     t_stamp timestamp without time zone NOT NULL,
     fisc_quarter smallint NOT NULL,
     day_of_week smallint NOT NULL
@@ -77,7 +77,7 @@ ALTER TABLE analytics.d_time OWNER TO alex_analytics;
 --
 
 CREATE TABLE analytics.f_fx_rate (
-    fx_id uuid NOT NULL,
+    fx_id uuid DEFAULT gen_random_uuid() NOT NULL,
     amount numeric(18,4) NOT NULL
 );
 
@@ -89,7 +89,7 @@ ALTER TABLE analytics.f_fx_rate OWNER TO alex_analytics;
 --
 
 CREATE TABLE analytics.f_transaction (
-    tx_id uuid NOT NULL,
+    tx_id uuid DEFAULT gen_random_uuid() NOT NULL,
     amount numeric(18,4) NOT NULL,
     c_id uuid,
     time_id uuid,
@@ -225,5 +225,5 @@ ALTER TABLE ONLY analytics.f_transaction
 -- PostgreSQL database dump complete
 --
 
-\unrestrict YKuR9VSvpPhTW0fYoRtcdmmV2UPk7FJXkQOxEHBnfOLOnwafpvfWsZBeXae2Du6
+\unrestrict FriY4TAWftPf8gyj87Jw5kBz7D6vBHthJHuYnwWXG43O6N9271MRLxY9wsZFP4J
 
