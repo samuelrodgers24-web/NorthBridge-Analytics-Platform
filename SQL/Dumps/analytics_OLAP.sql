@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict TMHvYiBMwAOdr0mbQW4yKXnAYKb6h6xfyFsBKW64gKB9qBJ14cAK64fXiektzKf
+\restrict mbOccHCkUiEbDap0hkLhh9YeDdva5eCp6ZbfU4uwObVQnSVVyI1mN4zadasusRr
 
 -- Dumped from database version 18.1
 -- Dumped by pg_dump version 18.1
@@ -40,7 +40,8 @@ CREATE TABLE analytics.d_company (
     c_id uuid DEFAULT gen_random_uuid() NOT NULL,
     c_name character varying(60) NOT NULL,
     industry character varying(60) NOT NULL,
-    hq_country character varying(60) NOT NULL
+    hq_country character varying(60) NOT NULL,
+    default_cncy character varying(3) NOT NULL
 );
 
 
@@ -93,9 +94,10 @@ CREATE TABLE analytics.f_transaction (
     amount numeric(18,4) NOT NULL,
     c_id uuid,
     time_id uuid,
-    cncy_code character varying(3),
-    base_fx_id uuid,
-    quote_fx_id uuid
+    base_cncy character varying(3) DEFAULT NULL::character varying,
+    quote_cncy uuid,
+    fx_rate uuid,
+    base_amount numeric(18,4) DEFAULT NULL::numeric
 );
 
 
@@ -105,7 +107,8 @@ ALTER TABLE analytics.f_transaction OWNER TO alex_analytics;
 -- Data for Name: d_company; Type: TABLE DATA; Schema: analytics; Owner: alex_analytics
 --
 
-COPY analytics.d_company (c_id, c_name, industry, hq_country) FROM stdin;
+COPY analytics.d_company (c_id, c_name, industry, hq_country, default_cncy) FROM stdin;
+f30835c4-d4b7-480a-89a5-17e730a7ff15	Fake Company	Fake Industry	Fake Country	AED
 \.
 
 
@@ -114,6 +117,8 @@ COPY analytics.d_company (c_id, c_name, industry, hq_country) FROM stdin;
 --
 
 COPY analytics.d_currency (cncy_code, cncy_name) FROM stdin;
+AED	UAE Dirham
+USD	US Dollars
 \.
 
 
@@ -122,6 +127,7 @@ COPY analytics.d_currency (cncy_code, cncy_name) FROM stdin;
 --
 
 COPY analytics.d_time (time_id, t_stamp, fisc_quarter, day_of_week) FROM stdin;
+6fe3ab9e-a58c-4614-a9f9-8e165bfaba42	2026-02-14 16:02:26.517208-05	1	7
 \.
 
 
@@ -130,6 +136,7 @@ COPY analytics.d_time (time_id, t_stamp, fisc_quarter, day_of_week) FROM stdin;
 --
 
 COPY analytics.f_fx_rate (fx_id, rate) FROM stdin;
+9bb70b71-feae-4540-a103-4bbbaa53988b	3.6700000
 \.
 
 
@@ -137,7 +144,7 @@ COPY analytics.f_fx_rate (fx_id, rate) FROM stdin;
 -- Data for Name: f_transaction; Type: TABLE DATA; Schema: analytics; Owner: alex_analytics
 --
 
-COPY analytics.f_transaction (tx_id, amount, c_id, time_id, cncy_code, base_fx_id, quote_fx_id) FROM stdin;
+COPY analytics.f_transaction (tx_id, amount, c_id, time_id, base_cncy, quote_cncy, fx_rate, base_amount) FROM stdin;
 \.
 
 
@@ -186,7 +193,7 @@ ALTER TABLE ONLY analytics.f_transaction
 --
 
 ALTER TABLE ONLY analytics.f_transaction
-    ADD CONSTRAINT f_transaction_base_fx_id_fkey FOREIGN KEY (base_fx_id) REFERENCES analytics.f_fx_rate(fx_id);
+    ADD CONSTRAINT f_transaction_base_fx_id_fkey FOREIGN KEY (quote_cncy) REFERENCES analytics.f_fx_rate(fx_id);
 
 
 --
@@ -202,7 +209,7 @@ ALTER TABLE ONLY analytics.f_transaction
 --
 
 ALTER TABLE ONLY analytics.f_transaction
-    ADD CONSTRAINT f_transaction_cncy_code_fkey FOREIGN KEY (cncy_code) REFERENCES analytics.d_currency(cncy_code);
+    ADD CONSTRAINT f_transaction_cncy_code_fkey FOREIGN KEY (base_cncy) REFERENCES analytics.d_currency(cncy_code);
 
 
 --
@@ -210,7 +217,7 @@ ALTER TABLE ONLY analytics.f_transaction
 --
 
 ALTER TABLE ONLY analytics.f_transaction
-    ADD CONSTRAINT f_transaction_quote_fx_id_fkey FOREIGN KEY (quote_fx_id) REFERENCES analytics.f_fx_rate(fx_id);
+    ADD CONSTRAINT f_transaction_quote_fx_id_fkey FOREIGN KEY (fx_rate) REFERENCES analytics.f_fx_rate(fx_id);
 
 
 --
@@ -225,5 +232,5 @@ ALTER TABLE ONLY analytics.f_transaction
 -- PostgreSQL database dump complete
 --
 
-\unrestrict TMHvYiBMwAOdr0mbQW4yKXnAYKb6h6xfyFsBKW64gKB9qBJ14cAK64fXiektzKf
+\unrestrict mbOccHCkUiEbDap0hkLhh9YeDdva5eCp6ZbfU4uwObVQnSVVyI1mN4zadasusRr
 
