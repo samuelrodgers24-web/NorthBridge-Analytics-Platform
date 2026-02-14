@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict 47PSbpZaYGXL0kzgxeLPYdr7ymEhvxsWh8fz1vEF86uO6K7SfukYB6hWZ3abM72
+\restrict TMHvYiBMwAOdr0mbQW4yKXnAYKb6h6xfyFsBKW64gKB9qBJ14cAK64fXiektzKf
 
 -- Dumped from database version 18.1
 -- Dumped by pg_dump version 18.1
@@ -78,7 +78,7 @@ ALTER TABLE analytics.d_time OWNER TO alex_analytics;
 
 CREATE TABLE analytics.f_fx_rate (
     fx_id uuid DEFAULT gen_random_uuid() NOT NULL,
-    amount numeric(18,4) NOT NULL
+    rate numeric(14,7) CONSTRAINT f_fx_rate_amount_not_null NOT NULL
 );
 
 
@@ -129,7 +129,7 @@ COPY analytics.d_time (time_id, t_stamp, fisc_quarter, day_of_week) FROM stdin;
 -- Data for Name: f_fx_rate; Type: TABLE DATA; Schema: analytics; Owner: alex_analytics
 --
 
-COPY analytics.f_fx_rate (fx_id, amount) FROM stdin;
+COPY analytics.f_fx_rate (fx_id, rate) FROM stdin;
 \.
 
 
@@ -225,5 +225,5 @@ ALTER TABLE ONLY analytics.f_transaction
 -- PostgreSQL database dump complete
 --
 
-\unrestrict 47PSbpZaYGXL0kzgxeLPYdr7ymEhvxsWh8fz1vEF86uO6K7SfukYB6hWZ3abM72
+\unrestrict TMHvYiBMwAOdr0mbQW4yKXnAYKb6h6xfyFsBKW64gKB9qBJ14cAK64fXiektzKf
 
