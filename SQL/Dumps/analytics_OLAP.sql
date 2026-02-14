@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict SqImLT5pXwvuBhbuxAAiI6Nxe6GhynEINwyJDbKrZWjcf6WwgnoT9sbBsqfcapM
+\restrict ieZzcaYd5TZLLy53OtoJbUQTdBXxBGk4quNsbphAuKLK5KVQPEbsKSKTRrDY7KO
 
 -- Dumped from database version 18.1
 -- Dumped by pg_dump version 18.1
@@ -95,7 +95,7 @@ CREATE TABLE analytics.f_transaction (
     c_id uuid NOT NULL,
     time_id uuid NOT NULL,
     base_cncy character varying(3) DEFAULT NULL::character varying,
-    quote_cncy uuid NOT NULL,
+    quote_cncy character varying(3) NOT NULL,
     fx_rate uuid,
     base_amount numeric(18,4) DEFAULT NULL::numeric
 );
@@ -189,11 +189,11 @@ ALTER TABLE ONLY analytics.f_transaction
 
 
 --
--- Name: f_transaction f_transaction_base_fx_id_fkey; Type: FK CONSTRAINT; Schema: analytics; Owner: alex_analytics
+-- Name: f_transaction f_transaction_base_cncy_fkey; Type: FK CONSTRAINT; Schema: analytics; Owner: alex_analytics
 --
 
 ALTER TABLE ONLY analytics.f_transaction
-    ADD CONSTRAINT f_transaction_base_fx_id_fkey FOREIGN KEY (quote_cncy) REFERENCES analytics.f_fx_rate(fx_id);
+    ADD CONSTRAINT f_transaction_base_cncy_fkey FOREIGN KEY (base_cncy) REFERENCES analytics.d_currency(cncy_code);
 
 
 --
@@ -205,19 +205,11 @@ ALTER TABLE ONLY analytics.f_transaction
 
 
 --
--- Name: f_transaction f_transaction_cncy_code_fkey; Type: FK CONSTRAINT; Schema: analytics; Owner: alex_analytics
+-- Name: f_transaction f_transaction_quote_fx_rate_fkey; Type: FK CONSTRAINT; Schema: analytics; Owner: alex_analytics
 --
 
 ALTER TABLE ONLY analytics.f_transaction
-    ADD CONSTRAINT f_transaction_cncy_code_fkey FOREIGN KEY (base_cncy) REFERENCES analytics.d_currency(cncy_code);
-
-
---
--- Name: f_transaction f_transaction_quote_fx_id_fkey; Type: FK CONSTRAINT; Schema: analytics; Owner: alex_analytics
---
-
-ALTER TABLE ONLY analytics.f_transaction
-    ADD CONSTRAINT f_transaction_quote_fx_id_fkey FOREIGN KEY (fx_rate) REFERENCES analytics.f_fx_rate(fx_id);
+    ADD CONSTRAINT f_transaction_quote_fx_rate_fkey FOREIGN KEY (fx_rate) REFERENCES analytics.f_fx_rate(fx_id);
 
 
 --
@@ -232,5 +224,5 @@ ALTER TABLE ONLY analytics.f_transaction
 -- PostgreSQL database dump complete
 --
 
-\unrestrict SqImLT5pXwvuBhbuxAAiI6Nxe6GhynEINwyJDbKrZWjcf6WwgnoT9sbBsqfcapM
+\unrestrict ieZzcaYd5TZLLy53OtoJbUQTdBXxBGk4quNsbphAuKLK5KVQPEbsKSKTRrDY7KO
 
