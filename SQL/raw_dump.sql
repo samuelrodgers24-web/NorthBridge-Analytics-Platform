@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict OWXR8TWUg2KNzYJS2CQMe5toM36v0YNHnaYxnqFVbwkHwVB96jjnsZnkcVrEH2H
+\restrict BphMQU20nwf1Htj7l8ZBDd3dlv3gh4brCNsvbYnn3Ex0TsODavgcN3mXwn97u6A
 
 -- Dumped from database version 18.1
 -- Dumped by pg_dump version 18.1
@@ -107,22 +107,8 @@ ALTER TABLE ONLY raw.transaction_event
 
 
 --
--- Name: idx_fx_pair_timestamp; Type: INDEX; Schema: raw; Owner: alex_analytics
---
-
-CREATE INDEX idx_fx_pair_timestamp ON raw.fx_rate USING btree (base_cncy, quote_cncy, fx_timestamp);
-
-
---
--- Name: idx_fx_timestamp; Type: INDEX; Schema: raw; Owner: alex_analytics
---
-
-CREATE INDEX idx_fx_timestamp ON raw.fx_rate USING btree (fx_timestamp);
-
-
---
 -- PostgreSQL database dump complete
 --
 
-\unrestrict OWXR8TWUg2KNzYJS2CQMe5toM36v0YNHnaYxnqFVbwkHwVB96jjnsZnkcVrEH2H
+\unrestrict BphMQU20nwf1Htj7l8ZBDd3dlv3gh4brCNsvbYnn3Ex0TsODavgcN3mXwn97u6A
 
