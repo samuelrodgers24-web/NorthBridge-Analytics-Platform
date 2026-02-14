@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict mbOccHCkUiEbDap0hkLhh9YeDdva5eCp6ZbfU4uwObVQnSVVyI1mN4zadasusRr
+\restrict SqImLT5pXwvuBhbuxAAiI6Nxe6GhynEINwyJDbKrZWjcf6WwgnoT9sbBsqfcapM
 
 -- Dumped from database version 18.1
 -- Dumped by pg_dump version 18.1
@@ -92,10 +92,10 @@ ALTER TABLE analytics.f_fx_rate OWNER TO alex_analytics;
 CREATE TABLE analytics.f_transaction (
     tx_id uuid DEFAULT gen_random_uuid() NOT NULL,
     amount numeric(18,4) NOT NULL,
-    c_id uuid,
-    time_id uuid,
+    c_id uuid NOT NULL,
+    time_id uuid NOT NULL,
     base_cncy character varying(3) DEFAULT NULL::character varying,
-    quote_cncy uuid,
+    quote_cncy uuid NOT NULL,
     fx_rate uuid,
     base_amount numeric(18,4) DEFAULT NULL::numeric
 );
@@ -232,5 +232,5 @@ ALTER TABLE ONLY analytics.f_transaction
 -- PostgreSQL database dump complete
 --
 
-\unrestrict mbOccHCkUiEbDap0hkLhh9YeDdva5eCp6ZbfU4uwObVQnSVVyI1mN4zadasusRr
+\unrestrict SqImLT5pXwvuBhbuxAAiI6Nxe6GhynEINwyJDbKrZWjcf6WwgnoT9sbBsqfcapM
 
