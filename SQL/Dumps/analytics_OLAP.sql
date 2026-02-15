@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict gB3QpUrmEdXyQRparPWlvPg4pHcfSR9U4cjKd8RpfbNMdFn0Q1ivAanFRgcnG9T
+\restrict ECRjpQNAE6Iqa2CgdTIVp1pSQ7Ut6GxHcSr0tT8Gu3Rfjmd9hV6gHb3fJzoJjU0
 
 -- Dumped from database version 18.1
 -- Dumped by pg_dump version 18.1
@@ -295,6 +295,13 @@ ALTER TABLE ONLY analytics.f_transaction
 
 
 --
+-- Name: idx_f_conversion_tx_id; Type: INDEX; Schema: analytics; Owner: alex_analytics
+--
+
+CREATE INDEX idx_f_conversion_tx_id ON analytics.f_conversion USING btree (tx_id);
+
+
+--
 -- Name: f_conversion trg_apply_conversion; Type: TRIGGER; Schema: analytics; Owner: alex_analytics
 --
 
@@ -352,5 +359,5 @@ ALTER TABLE ONLY analytics.f_conversion
 -- PostgreSQL database dump complete
 --
 
-\unrestrict gB3QpUrmEdXyQRparPWlvPg4pHcfSR9U4cjKd8RpfbNMdFn0Q1ivAanFRgcnG9T
+\unrestrict ECRjpQNAE6Iqa2CgdTIVp1pSQ7Ut6GxHcSr0tT8Gu3Rfjmd9hV6gHb3fJzoJjU0
 
