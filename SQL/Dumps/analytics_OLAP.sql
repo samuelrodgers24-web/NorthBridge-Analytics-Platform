@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict xCagACELbZPmeTOf8MmaCKearx17Mu6DCVh8bvDExlJS2Hp5gtQYKhHvfTXxjse
+\restrict gB3QpUrmEdXyQRparPWlvPg4pHcfSR9U4cjKd8RpfbNMdFn0Q1ivAanFRgcnG9T
 
 -- Dumped from database version 18.1
 -- Dumped by pg_dump version 18.1
@@ -55,6 +55,43 @@ $$;
 
 
 ALTER FUNCTION analytics.apply_conversion() OWNER TO alex_analytics;
+
+--
+-- Name: validate_conversion_currency(); Type: FUNCTION; Schema: analytics; Owner: alex_analytics
+--
+
+CREATE FUNCTION analytics.validate_conversion_currency() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+DECLARE
+    v_tx_cncy varchar(3);
+    v_quote_cncy varchar(3);
+BEGIN
+    -- Get transaction currency
+    SELECT cncy
+    INTO v_tx_cncy
+    FROM analytics.f_transaction
+    WHERE tx_id = NEW.tx_id;
+
+    -- Get FX quote currency
+    SELECT quote_cncy
+    INTO v_quote_cncy
+    FROM analytics.f_fx_rate
+    WHERE fx_id = NEW.fx_id;
+
+    -- Validate
+    IF v_tx_cncy IS DISTINCT FROM v_quote_cncy THEN
+        RAISE EXCEPTION
+        'Transaction currency (%) does not match FX quote currency (%)',
+        v_tx_cncy, v_quote_cncy;
+    END IF;
+
+    RETURN NEW;
+END;
+$$;
+
+
+ALTER FUNCTION analytics.validate_conversion_currency() OWNER TO alex_analytics;
 
 SET default_tablespace = '';
 
@@ -122,7 +159,9 @@ ALTER TABLE analytics.f_conversion OWNER TO alex_analytics;
 
 CREATE TABLE analytics.f_fx_rate (
     fx_id uuid DEFAULT gen_random_uuid() NOT NULL,
-    rate numeric(14,7) CONSTRAINT f_fx_rate_amount_not_null NOT NULL
+    rate numeric(14,7) CONSTRAINT f_fx_rate_amount_not_null NOT NULL,
+    base_cncy character varying(3) NOT NULL,
+    quote_cncy character varying(3) NOT NULL
 );
 
 
@@ -184,8 +223,8 @@ COPY analytics.f_conversion (cx_id, base_amount, fee_amount, fx_id, tx_id) FROM 
 -- Data for Name: f_fx_rate; Type: TABLE DATA; Schema: analytics; Owner: alex_analytics
 --
 
-COPY analytics.f_fx_rate (fx_id, rate) FROM stdin;
-9b62a1d0-ba83-4b90-adeb-6c46de2afdfb	3.6700000
+COPY analytics.f_fx_rate (fx_id, rate, base_cncy, quote_cncy) FROM stdin;
+83520698-1726-44b5-ae98-ab71dc7011dc	3.6700000	USD	AED
 \.
 
 
@@ -224,6 +263,14 @@ ALTER TABLE ONLY analytics.d_time
 
 
 --
+-- Name: f_conversion f_conversion_one_per_tx; Type: CONSTRAINT; Schema: analytics; Owner: alex_analytics
+--
+
+ALTER TABLE ONLY analytics.f_conversion
+    ADD CONSTRAINT f_conversion_one_per_tx UNIQUE (tx_id);
+
+
+--
 -- Name: f_conversion f_conversion_pkey; Type: CONSTRAINT; Schema: analytics; Owner: alex_analytics
 --
 
@@ -255,6 +302,29 @@ CREATE TRIGGER trg_apply_conversion AFTER INSERT OR UPDATE ON analytics.f_conver
 
 
 --
+-- Name: f_conversion trg_validate_conversion_currency; Type: TRIGGER; Schema: analytics; Owner: alex_analytics
+--
+
+CREATE TRIGGER trg_validate_conversion_currency BEFORE INSERT OR UPDATE ON analytics.f_conversion FOR EACH ROW EXECUTE FUNCTION analytics.validate_conversion_currency();
+
+
+--
+-- Name: f_fx_rate f_fx_rate_base_cncy_fkey; Type: FK CONSTRAINT; Schema: analytics; Owner: alex_analytics
+--
+
+ALTER TABLE ONLY analytics.f_fx_rate
+    ADD CONSTRAINT f_fx_rate_base_cncy_fkey FOREIGN KEY (base_cncy) REFERENCES analytics.d_currency(cncy_code);
+
+
+--
+-- Name: f_fx_rate f_fx_rate_quote_cncy_fkey; Type: FK CONSTRAINT; Schema: analytics; Owner: alex_analytics
+--
+
+ALTER TABLE ONLY analytics.f_fx_rate
+    ADD CONSTRAINT f_fx_rate_quote_cncy_fkey FOREIGN KEY (quote_cncy) REFERENCES analytics.d_currency(cncy_code);
+
+
+--
 -- Name: f_transaction f_transaction_c_id_fkey; Type: FK CONSTRAINT; Schema: analytics; Owner: alex_analytics
 --
 
@@ -282,5 +352,5 @@ ALTER TABLE ONLY analytics.f_conversion
 -- PostgreSQL database dump complete
 --
 
-\unrestrict xCagACELbZPmeTOf8MmaCKearx17Mu6DCVh8bvDExlJS2Hp5gtQYKhHvfTXxjse
+\unrestrict gB3QpUrmEdXyQRparPWlvPg4pHcfSR9U4cjKd8RpfbNMdFn0Q1ivAanFRgcnG9T
 
