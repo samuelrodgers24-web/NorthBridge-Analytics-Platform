@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict a2Ot70j1XFicWHFmpDNJCiLjmXnRfzIKUEGAoT9CkYdt7A29Los4XAvXJ80O3FN
+\restrict xCagACELbZPmeTOf8MmaCKearx17Mu6DCVh8bvDExlJS2Hp5gtQYKhHvfTXxjse
 
 -- Dumped from database version 18.1
 -- Dumped by pg_dump version 18.1
@@ -27,6 +27,34 @@ CREATE SCHEMA analytics;
 
 
 ALTER SCHEMA analytics OWNER TO alex_analytics;
+
+--
+-- Name: apply_conversion(); Type: FUNCTION; Schema: analytics; Owner: alex_analytics
+--
+
+CREATE FUNCTION analytics.apply_conversion() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+DECLARE
+    v_rate numeric(14,7);
+BEGIN
+    -- Get FX rate
+    SELECT rate
+    INTO v_rate
+    FROM analytics.f_fx_rate
+    WHERE fx_id = NEW.fx_id;
+
+    -- Update related transaction amount
+    UPDATE analytics.f_transaction
+    SET amount = (NEW.base_amount * v_rate) - NEW.fee_amount
+    WHERE tx_id = NEW.tx_id;
+
+    RETURN NEW;
+END;
+$$;
+
+
+ALTER FUNCTION analytics.apply_conversion() OWNER TO alex_analytics;
 
 SET default_tablespace = '';
 
@@ -120,6 +148,7 @@ ALTER TABLE analytics.f_transaction OWNER TO alex_analytics;
 --
 
 COPY analytics.d_company (c_id, c_name, industry, hq_country, default_cncy) FROM stdin;
+26a351bb-212b-475f-96c0-e641bca71de9	Fake Company	Fake Industry	Fake Country	AED
 \.
 
 
@@ -128,6 +157,8 @@ COPY analytics.d_company (c_id, c_name, industry, hq_country, default_cncy) FROM
 --
 
 COPY analytics.d_currency (cncy_code, cncy_name) FROM stdin;
+AED	UAE Dirham
+USD	US Dollars
 \.
 
 
@@ -136,6 +167,7 @@ COPY analytics.d_currency (cncy_code, cncy_name) FROM stdin;
 --
 
 COPY analytics.d_time (time_id, t_stamp, fisc_quarter, day_of_week) FROM stdin;
+359fba96-cd1c-4c67-9154-e6cd6acf8849	2026-02-14 22:17:11.348553-05	1	7
 \.
 
 
@@ -144,6 +176,7 @@ COPY analytics.d_time (time_id, t_stamp, fisc_quarter, day_of_week) FROM stdin;
 --
 
 COPY analytics.f_conversion (cx_id, base_amount, fee_amount, fx_id, tx_id) FROM stdin;
+8402ae37-5b2a-42c4-94cf-e57aa1ecc425	100.0000	2.0000	9b62a1d0-ba83-4b90-adeb-6c46de2afdfb	9230557b-63ff-4a2e-8a02-43901bf55635
 \.
 
 
@@ -152,6 +185,7 @@ COPY analytics.f_conversion (cx_id, base_amount, fee_amount, fx_id, tx_id) FROM 
 --
 
 COPY analytics.f_fx_rate (fx_id, rate) FROM stdin;
+9b62a1d0-ba83-4b90-adeb-6c46de2afdfb	3.6700000
 \.
 
 
@@ -160,6 +194,8 @@ COPY analytics.f_fx_rate (fx_id, rate) FROM stdin;
 --
 
 COPY analytics.f_transaction (tx_id, amount, c_id, time_id, cncy) FROM stdin;
+97063308-a8d7-4300-9d11-b407a94cf725	35443.0000	26a351bb-212b-475f-96c0-e641bca71de9	359fba96-cd1c-4c67-9154-e6cd6acf8849	AED
+9230557b-63ff-4a2e-8a02-43901bf55635	365.0000	26a351bb-212b-475f-96c0-e641bca71de9	359fba96-cd1c-4c67-9154-e6cd6acf8849	AED
 \.
 
 
@@ -212,6 +248,13 @@ ALTER TABLE ONLY analytics.f_transaction
 
 
 --
+-- Name: f_conversion trg_apply_conversion; Type: TRIGGER; Schema: analytics; Owner: alex_analytics
+--
+
+CREATE TRIGGER trg_apply_conversion AFTER INSERT OR UPDATE ON analytics.f_conversion FOR EACH ROW EXECUTE FUNCTION analytics.apply_conversion();
+
+
+--
 -- Name: f_transaction f_transaction_c_id_fkey; Type: FK CONSTRAINT; Schema: analytics; Owner: alex_analytics
 --
 
@@ -239,5 +282,5 @@ ALTER TABLE ONLY analytics.f_conversion
 -- PostgreSQL database dump complete
 --
 
-\unrestrict a2Ot70j1XFicWHFmpDNJCiLjmXnRfzIKUEGAoT9CkYdt7A29Los4XAvXJ80O3FN
+\unrestrict xCagACELbZPmeTOf8MmaCKearx17Mu6DCVh8bvDExlJS2Hp5gtQYKhHvfTXxjse
 
