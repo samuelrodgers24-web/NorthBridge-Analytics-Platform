@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict LAFUm9eMzavSCP3B94DxwrF42OzLS3Jx9C0PcOEO2Byuleoow5lGuRgNLjddX9d
+\restrict a2Ot70j1XFicWHFmpDNJCiLjmXnRfzIKUEGAoT9CkYdt7A29Los4XAvXJ80O3FN
 
 -- Dumped from database version 18.1
 -- Dumped by pg_dump version 18.1
@@ -81,7 +81,8 @@ CREATE TABLE analytics.f_conversion (
     cx_id uuid DEFAULT gen_random_uuid() NOT NULL,
     base_amount numeric(18,4) NOT NULL,
     fee_amount numeric(16,4) NOT NULL,
-    fx_id uuid NOT NULL
+    fx_id uuid NOT NULL,
+    tx_id uuid NOT NULL
 );
 
 
@@ -108,8 +109,7 @@ CREATE TABLE analytics.f_transaction (
     amount numeric(18,4) NOT NULL,
     c_id uuid NOT NULL,
     time_id uuid NOT NULL,
-    cncy character varying(3) CONSTRAINT f_transaction_quote_cncy_not_null NOT NULL,
-    cx_id uuid
+    cncy character varying(3) CONSTRAINT f_transaction_quote_cncy_not_null NOT NULL
 );
 
 
@@ -143,7 +143,7 @@ COPY analytics.d_time (time_id, t_stamp, fisc_quarter, day_of_week) FROM stdin;
 -- Data for Name: f_conversion; Type: TABLE DATA; Schema: analytics; Owner: alex_analytics
 --
 
-COPY analytics.f_conversion (cx_id, base_amount, fee_amount, fx_id) FROM stdin;
+COPY analytics.f_conversion (cx_id, base_amount, fee_amount, fx_id, tx_id) FROM stdin;
 \.
 
 
@@ -159,7 +159,7 @@ COPY analytics.f_fx_rate (fx_id, rate) FROM stdin;
 -- Data for Name: f_transaction; Type: TABLE DATA; Schema: analytics; Owner: alex_analytics
 --
 
-COPY analytics.f_transaction (tx_id, amount, c_id, time_id, cncy, cx_id) FROM stdin;
+COPY analytics.f_transaction (tx_id, amount, c_id, time_id, cncy) FROM stdin;
 \.
 
 
@@ -220,14 +220,6 @@ ALTER TABLE ONLY analytics.f_transaction
 
 
 --
--- Name: f_transaction f_transaction_cx_id_fkey; Type: FK CONSTRAINT; Schema: analytics; Owner: alex_analytics
---
-
-ALTER TABLE ONLY analytics.f_transaction
-    ADD CONSTRAINT f_transaction_cx_id_fkey FOREIGN KEY (cx_id) REFERENCES analytics.f_conversion(cx_id);
-
-
---
 -- Name: f_transaction f_transaction_time_id_fkey; Type: FK CONSTRAINT; Schema: analytics; Owner: alex_analytics
 --
 
@@ -236,8 +228,16 @@ ALTER TABLE ONLY analytics.f_transaction
 
 
 --
+-- Name: f_conversion f_transaction_tx_id_fkey; Type: FK CONSTRAINT; Schema: analytics; Owner: alex_analytics
+--
+
+ALTER TABLE ONLY analytics.f_conversion
+    ADD CONSTRAINT f_transaction_tx_id_fkey FOREIGN KEY (tx_id) REFERENCES analytics.f_transaction(tx_id);
+
+
+--
 -- PostgreSQL database dump complete
 --
 
-\unrestrict LAFUm9eMzavSCP3B94DxwrF42OzLS3Jx9C0PcOEO2Byuleoow5lGuRgNLjddX9d
+\unrestrict a2Ot70j1XFicWHFmpDNJCiLjmXnRfzIKUEGAoT9CkYdt7A29Los4XAvXJ80O3FN
 
